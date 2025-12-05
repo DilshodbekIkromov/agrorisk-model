@@ -40,6 +40,18 @@ from pdf_generator import generate_loan_pdf
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/')
+def index():
+    return jsonify({
+        "status": "online",
+        "message": "AgroRisk API is running",
+        "endpoints": {
+            "health": "/health",
+            "predict": "/api/predict",
+            "regions": "/api/regions"
+        }
+    })
+
 # Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///agrorisk.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
