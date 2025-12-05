@@ -3,6 +3,7 @@ ML Service - Wrapper for crop risk prediction model
 """
 
 import sys
+import os
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -70,39 +71,43 @@ class MLService:
     
     def get_satellite_data(self, region, district, lat, lon):
         """Get satellite data with fallback to cache"""
+        # On Render free tier, avoid slow/blocked live fetch; use cache immediately when GEE is not configured
+        gee_project = os.getenv("GEE_PROJECT_ID")
+        if not gee_project:
+            return self._cached_or_fallback(region, district, lat, lon)
+
         try:
-            # Try real-time fetch
             satellite_data, error = fetch_satellite_data_for_location(region, district, lat, lon)
             if satellite_data is None or error:
                 raise Exception(error or "No satellite data available")
             return satellite_data
         except Exception as e:
             print(f"⚠️  Using cached satellite data: {e}")
-            
-            # Try cache
-            if self.sat_cache is not None and not self.sat_cache.empty:
-                row = self.sat_cache[
-                    (self.sat_cache["region"] == region) & 
-                    (self.sat_cache["district"] == district)
-                ]
-                if not row.empty:
-                    data = row.iloc[0].to_dict()
-                    data.setdefault("latitude", lat)
-                    data.setdefault("longitude", lon)
-                    return data
-            
-            # Ultimate fallback
-            return {
-                "region": region,
-                "district": district,
-                "latitude": lat,
-                "longitude": lon,
-                "ndvi_mean": 0.3,
-                "lst_mean_c": 20.0,
-                "lst_min_c": 5.0,
-                "lst_max_c": 35.0,
-                "precipitation_annual_mm": 200.0
-            }
+            return self._cached_or_fallback(region, district, lat, lon)
+
+    def _cached_or_fallback(self, region, district, lat, lon):
+        if self.sat_cache is not None and not self.sat_cache.empty:
+            row = self.sat_cache[
+                (self.sat_cache["region"] == region) &
+                (self.sat_cache["district"] == district)
+            ]
+            if not row.empty:
+                data = row.iloc[0].to_dict()
+                data.setdefault("latitude", lat)
+                data.setdefault("longitude", lon)
+                return data
+
+        return {
+            "region": region,
+            "district": district,
+            "latitude": lat,
+            "longitude": lon,
+            "ndvi_mean": 0.3,
+            "lst_mean_c": 20.0,
+            "lst_min_c": 5.0,
+            "lst_max_c": 35.0,
+            "precipitation_annual_mm": 200.0
+        }
     
     def predict_risk(self, region, district, crop):
         """
@@ -137,8 +142,8 @@ class MLService:
             input_df = pd.DataFrame([input_data])
             prediction = self.model.predict(input_df)[0]
             
-            # Get recommendations
-            recommendations = self.model.get_recommendations(input_df, crop.lower())
+            # Simplify recommendations for performance on free-tier dynos
+            recommendations = []
             
             # Get crop info
             crop_info = get_crop_info(crop.lower())
