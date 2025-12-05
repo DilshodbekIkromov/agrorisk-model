@@ -10,3 +10,8 @@ requests>=2.31.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 gunicorn
+# Flask Backend Dependencies
+flask==3.0.0
+flask-cors==4.0.0
+flask-sqlalchemy==3.1.1
+reportlab==4.0.7
