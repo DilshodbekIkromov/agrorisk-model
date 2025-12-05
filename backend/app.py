@@ -3,7 +3,7 @@ Flask Backend for AgroRisk Copilot
 Provides REST API with database persistence and PDF generation
 """
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -28,6 +28,7 @@ def safe_json_dumps(obj):
 
 # Add project paths
 project_root = Path(__file__).parent.parent
+FRONTEND_DIR = project_root / "frontend"
 sys.path.append(str(project_root / "src"))
 sys.path.append(str(project_root / "data" / "raw"))
 # Add backend to path so we can import models
@@ -39,18 +40,6 @@ from pdf_generator import generate_loan_pdf
 
 app = Flask(__name__)
 CORS(app)
-
-@app.route('/')
-def index():
-    return jsonify({
-        "status": "online",
-        "message": "AgroRisk API is running",
-        "endpoints": {
-            "health": "/health",
-            "predict": "/api/predict",
-            "regions": "/api/regions"
-        }
-    })
 
 # Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///agrorisk.db'
@@ -365,6 +354,21 @@ def download_report(application_id):
     except Exception as e:
         print(f"Error generating PDF: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    """Serve the built frontend (SPA) from /frontend"""
+    # Let API and health routes be handled by Flask handlers
+    if path.startswith('api') or path == 'health':
+        return jsonify({"error": "Not Found"}), 404
+
+    full_path = FRONTEND_DIR / path
+    if path and full_path.exists():
+        return send_from_directory(FRONTEND_DIR, path)
+    # Fallback to index.html for SPA routes
+    return send_from_directory(FRONTEND_DIR, 'index.html')
 
 
 if __name__ == '__main__':
