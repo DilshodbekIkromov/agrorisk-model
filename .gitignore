@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data - large files (exclude by default, include specific files)
+data/raw/*.csv
+data/raw/*.json
+data/synthetic/*.csv
+data/synthetic/*.json
+data/processed/*.csv
+
+# Keep Python files and small config files
+!data/raw/*.py
+!models/model_metadata.json
+
+# Models - large binary files
+models/*.joblib
+models/*.pkl
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

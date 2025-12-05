@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroRisk Copilot - Agricultural Risk Assessment</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🌾 AgroRisk Copilot</h1>
+            <p>AI-Powered Agricultural Risk Assessment for Uzbekistan</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Form Section -->
+            <section class="input-section">
+                <h2>Crop Risk Assessment</h2>
+                
+                <form id="riskForm">
+                    <div class="form-group">
+                        <label for="region">Region:</label>
+                        <select id="region" required>
+                            <option value="">Select a region...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="district">District:</label>
+                        <select id="district" required disabled>
+                            <option value="">Select a region first...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="crop">Crop:</label>
+                        <select id="crop" required>
+                            <option value="">Select a crop...</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-primary">
+                        Check Risk
+                    </button>
+                </form>
+
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Analyzing conditions...</p>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="results-section hidden">
+                <h2>Risk Assessment Results</h2>
+                
+                <!-- Risk Score Display -->
+                <div class="risk-score-container">
+                    <div id="riskScoreCircle" class="risk-circle">
+                        <span id="riskScoreValue" class="risk-score-value">--</span>
+                        <span class="risk-score-label">Risk Score</span>
+                    </div>
+                    <div class="risk-info">
+                        <h3 id="riskStatus" class="risk-status">--</h3>
+                        <p id="riskConfidence" class="risk-confidence">--</p>
+                        <div id="locationInfo" class="location-info">
+                            <p><strong>Location:</strong> <span id="locationText">--</span></p>
+                            <p><strong>Crop:</strong> <span id="cropText">--</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Factors -->
+                <div class="factors-section">
+                    <h3>Top Contributing Factors</h3>
+                    <ul id="factorsList" class="factors-list"></ul>
+                </div>
+
+                <!-- Current Conditions -->
+                <div class="conditions-section">
+                    <h3>Current Conditions</h3>
+                    <div id="conditionsGrid" class="conditions-grid"></div>
+                </div>
+
+                <!-- Recommendations -->
+                <div id="recommendationsSection" class="recommendations-section hidden">
+                    <h3>Alternative Crop Recommendations</h3>
+                    <div id="recommendationsList" class="recommendations-list"></div>
+                </div>
+
+                <div class="proceed-wrapper">
+                    <button id="btnProceedToLoan" class="action-btn hidden" type="button">
+                        Continue to Loan Application
+                    </button>
+                </div>
+
+                <!-- Regional Map Button -->
+                <button id="showMapBtn" class="btn-secondary">
+                    📍 View Regional Risk Map
+                </button>
+            </section>
+
+            <!-- Loan Application Section -->
+            <section id="loanSection" class="input-section hidden">
+                <div class="loan-title-wrap">
+                    <h2 class="loan-title">💰 Loan Application & Financials <span class="loan-badge">Credit</span></h2>
+                    <p class="loan-subtitle">Combine Agro risk with farmer financials for the final decision.</p>
+                </div>
+                <form id="loanForm" class="loan-form">
+                    <div class="loan-block">
+                        <div class="form-group-header">Farmer Profile</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="farmerName">Full Name</label>
+                                <input type="text" id="farmerName" placeholder="e.g. Alisher Karimov" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="passportId">Passport ID</label>
+                                <input type="text" id="passportId" placeholder="e.g. AA1234567" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phoneNumber">Phone Number</label>
+                                <input type="tel" id="phoneNumber" placeholder="+998..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="yearsFarming">Years Farming</label>
+                                <input type="number" id="yearsFarming" min="0" placeholder="e.g. 5" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="loan-block">
+                        <div class="form-group-header">Loan Request</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="landArea">Land Area (hectares)</label>
+                                <input type="number" id="landArea" step="0.1" placeholder="e.g. 12.5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="landOwnership">Land Ownership</label>
+                                <select id="landOwnership">
+                                    <option value="owned">Owned</option>
+                                    <option value="leased_long">Leased (&gt;5 years)</option>
+                                    <option value="leased_short">Leased (&lt;5 years)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="loanAmount">Loan Amount (UZS)</label>
+                                <input type="number" id="loanAmount" placeholder="e.g. 50000000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loanTerm">Term (Months)</label>
+                                <input type="number" id="loanTerm" placeholder="e.g. 12" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="loan-block">
+                        <div class="form-group-header">Financial Health</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="annualRevenue">Annual Revenue (Last Year)</label>
+                                <input type="number" id="annualRevenue" placeholder="e.g. 120000000" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="netProfit">Net Profit (Last Year)</label>
+                                <input type="number" id="netProfit" placeholder="e.g. 30000000" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="totalAssets">Total Assets Value</label>
+                                <input type="number" id="totalAssets" placeholder="Land + Equipment" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="totalDebt">Total Existing Debt</label>
+                                <input type="number" id="totalDebt" value="0" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="collateralValue">Collateral Value</label>
+                                <input type="number" id="collateralValue" placeholder="Pledged land/machinery" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="previousDefaults">Previous Defaults?</label>
+                                <select id="previousDefaults">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="loan-actions">
+                        <button type="submit" class="submit-btn primary">Calculate Final Credit Score</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Credit Result Section -->
+            <section id="creditResultSection" class="results-section hidden">
+                <h2>✅ Final Credit Decision</h2>
+                <div id="creditScoreDisplay" class="risk-score-container"></div>
+                <div id="creditFactors" class="factors-section"></div>
+            </section>
+
+            <!-- Map Section -->
+            <section id="mapSection" class="map-section hidden">
+                <div class="map-header">
+                    <h2>Regional Risk Map</h2>
+                    <button id="closeMapBtn" class="btn-close">✕ Close</button>
+                </div>
+                <div id="map" class="map-container"></div>
+                <div class="map-legend">
+                    <h4>Risk Levels:</h4>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #28a745;"></span>
+                        <span>Low Risk (70-100)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #ffc107;"></span>
+                        <span>Medium Risk (40-69)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #dc3545;"></span>
+                        <span>High Risk (0-39)</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>AgroRisk Copilot v1.0 | Powered by AI & Satellite Data</p>
+            <p class="info-text">🟢 70-100: Low Risk | 🟡 40-69: Medium Risk | 🔴 0-39: High Risk</p>
+        </footer>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+</html>

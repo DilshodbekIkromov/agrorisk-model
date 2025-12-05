@@ -1,0 +1,160 @@
+{
+  "training_date": "2025-12-05T02:01:43.946530",
+  "model_type": "LightGBM",
+  "n_features": 24,
+  "n_samples_train": 2160,
+  "n_samples_test": 540,
+  "best_iteration": 135,
+  "hyperparameters": {
+    "num_leaves": 26,
+    "learning_rate": 0.040766038439886985,
+    "feature_fraction": 0.8617397086996272,
+    "bagging_fraction": 0.7356519445915479,
+    "bagging_freq": 5,
+    "min_child_samples": 13,
+    "lambda_l1": 1.688218673800579e-05,
+    "lambda_l2": 0.00030184029149776,
+    "objective": "regression",
+    "metric": "mae",
+    "verbosity": -1,
+    "boosting_type": "gbdt"
+  },
+  "performance": {
+    "train_mae": 1.2562664947759075,
+    "train_rmse": 1.5859930407873775,
+    "train_r2": 0.9863352087916909,
+    "test_mae": 1.7314233184145644,
+    "test_rmse": 2.174068340662205,
+    "test_r2": 0.9758219984675885
+  },
+  "feature_importance": [
+    {
+      "feature": "region_suitable",
+      "importance": 2319854.408246994
+    },
+    {
+      "feature": "ndvi_score",
+      "importance": 459194.0567922592
+    },
+    {
+      "feature": "water_match",
+      "importance": 444747.22470474243
+    },
+    {
+      "feature": "temp_match",
+      "importance": 142305.04520130157
+    },
+    {
+      "feature": "crop_drought_sens",
+      "importance": 76905.6525592804
+    },
+    {
+      "feature": "ndvi_max",
+      "importance": 50359.257652282715
+    },
+    {
+      "feature": "ndvi_mean",
+      "importance": 23187.97629737854
+    },
+    {
+      "feature": "crop_category",
+      "importance": 19225.422763824463
+    },
+    {
+      "feature": "crop",
+      "importance": 17578.721636772156
+    },
+    {
+      "feature": "precipitation_annual_mm",
+      "importance": 16298.305731773376
+    },
+    {
+      "feature": "ndvi_std",
+      "importance": 16090.765659332275
+    },
+    {
+      "feature": "lst_max_c",
+      "importance": 15660.171387195587
+    },
+    {
+      "feature": "crop_temp_min",
+      "importance": 15515.063103675842
+    },
+    {
+      "feature": "longitude",
+      "importance": 14807.280537128448
+    },
+    {
+      "feature": "crop_frost_sens",
+      "importance": 12801.980520248413
+    },
+    {
+      "feature": "crop_water_need",
+      "importance": 8664.727997779846
+    },
+    {
+      "feature": "crop_temp_max",
+      "importance": 5824.078502655029
+    },
+    {
+      "feature": "latitude",
+      "importance": 3587.9156045913696
+    },
+    {
+      "feature": "lst_mean_c",
+      "importance": 3533.8099126815796
+    },
+    {
+      "feature": "crop_ndvi_min",
+      "importance": 2787.9037103652954
+    },
+    {
+      "feature": "district",
+      "importance": 2500.2489199638367
+    },
+    {
+      "feature": "region",
+      "importance": 2337.892247200012
+    },
+    {
+      "feature": "ndvi_min",
+      "importance": 2239.633746623993
+    },
+    {
+      "feature": "lst_min_c",
+      "importance": 1709.280343055725
+    }
+  ],
+  "feature_columns": [
+    "region",
+    "district",
+    "latitude",
+    "longitude",
+    "ndvi_mean",
+    "ndvi_max",
+    "ndvi_min",
+    "ndvi_std",
+    "lst_mean_c",
+    "lst_max_c",
+    "lst_min_c",
+    "precipitation_annual_mm",
+    "crop",
+    "crop_category",
+    "crop_temp_min",
+    "crop_temp_max",
+    "crop_water_need",
+    "crop_ndvi_min",
+    "crop_drought_sens",
+    "crop_frost_sens",
+    "region_suitable",
+    "temp_match",
+    "water_match",
+    "ndvi_score"
+  ],
+  "categorical_columns": [
+    "region",
+    "district",
+    "crop",
+    "crop_category"
+  ]
+}
