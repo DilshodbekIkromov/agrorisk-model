@@ -30,6 +30,8 @@ def safe_json_dumps(obj):
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root / "src"))
 sys.path.append(str(project_root / "data" / "raw"))
+# Add backend to path so we can import models
+sys.path.append(str(Path(__file__).parent))
 
 from models import db, Farmer, RiskAssessment, LoanApplication, CreditDecision
 from ml_service import MLService
